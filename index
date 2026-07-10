@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WIT ONE - Admin Tool</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #fbfaf6; /* ครีมอ่อน */
+            --primary-color: #142a46; /* น้ำเงินกรมท่า */
+            --accent-gold: #ab9575; /* ทอง/เบจ */
+            --accent-green: #508b2b; /* เขียว */
+            --gray-light: #f0f0f0;
+            --gray-text: #666666;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: 'Prompt', sans-serif;
+            background-color: #e5e5e5;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .admin-container {
+            background-color: var(--bg-color);
+            width: 100%;
+            max-width: 480px;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .header-title {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 25px;
+        }
+        
+        .header-title h1 { margin: 0; font-size: 24px; font-weight: 700; }
+        .header-title p { margin: 0; font-size: 14px; color: var(--accent-gold); }
+
+        /* Selector Groups */
+        .section-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin: 15px 0 8px 0;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .radio-group input[type="radio"] {
+            display: none;
+        }
+
+        .radio-group label {
+            flex: 1;
+            text-align: center;
+            background-color: var(--white);
+            border: 1px solid #ddd;
+            color: var(--gray-text);
+            padding: 10px 5px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        /* Number of students grid */
+        .pax-group label { flex: 0 0 calc(25% - 6px); }
+
+        .radio-group input[type="radio"]:checked + label {
+            background-color: var(--primary-color);
+            color: var(--white);
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 10px rgba(20, 42, 70, 0.2);
+        }
+
+        /* Gold highlight for Tier */
+        .tier-group input[type="radio"]:checked + label {
+            background-color: var(--accent-gold);
+            border-color: var(--accent-gold);
+        }
+
+        /* Summary Card */
+        .summary-card {
+            margin-top: 25px;
+            background-color: var(--white);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .summary-header {
+            background-color: var(--primary-color);
+            color: var(--white);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .summary-header .title { font-size: 14px; opacity: 0.9; }
+        .summary-header .subtitle { font-size: 16px; font-weight: 600; }
+        .summary-header .price-box { text-align: right; }
+        .summary-header .price { font-size: 28px; font-weight: 700; line-height: 1; }
+        .summary-header .unit { font-size: 11px; opacity: 0.8; }
+
+        .summary-body {
+            padding: 10px 20px;
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px dashed #eee;
+            font-size: 14px;
+            align-items: center;
+        }
+        .data-row:last-child { border-bottom: none; }
+        .data-row .label { color: #555; }
+        .data-row .label small { display: block; font-size: 11px; color: #999; }
+        .data-row .value { font-weight: 600; color: var(--primary-color); }
+        
+        .badge {
+            background-color: var(--gray-light);
+            padding: 4px 10px;
+            border-radius: 6px;
+            color: var(--primary-color);
+        }
+        .badge.dark {
+            background-color: #333;
+            color: white;
+        }
+
+        /* Note Box */
+        .admin-note {
+            background-color: #f9f5ef;
+            border-left: 4px solid var(--accent-gold);
+            padding: 12px 15px;
+            font-size: 12px;
+            color: #555;
+            margin: 15px 20px;
+            border-radius: 4px;
+        }
+
+        /* Copy Sections */
+        .copy-section {
+            margin-top: 20px;
+            border-top: 1px solid #ddd;
+            padding-top: 20px;
+            position: relative;
+        }
+        
+        .copy-title {
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 15px;
+            background: var(--bg-color);
+            display: inline-block;
+            padding: 0 10px;
+            position: absolute;
+            top: -9px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .preview-text {
+            background: var(--white);
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #444;
+            margin-bottom: 15px;
+            white-space: pre-line;
+            border: 1px solid #eee;
+            line-height: 1.5;
+        }
+
+        .btn-copy {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Prompt', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-copy.tutor { background-color: var(--primary-color); color: var(--white); }
+        .btn-copy.student { background-color: var(--accent-green); color: var(--white); }
+        .btn-copy:active { transform: scale(0.98); }
+
+    </style>
+</head>
+<body>
+
+    <div class="admin-container">
+        <div class="header-title">
+            <h1>WIT ONE</h1>
+            <p>คำนวณราคา - Admin Tool</p>
+        </div>
+
+        <!-- Tier Selection -->
+        <div class="section-label">ระดับชั้น (TIER)</div>
+        <div class="radio-group tier-group">
+            <input type="radio" name="tier" id="tier-found" value="foundation" checked>
+            <label for="tier-found">Foundation<br><small>ประถม</small></label>
+            
+            <input type="radio" name="tier" id="tier-inter" value="intermediate">
+            <label for="tier-inter">Intermediate<br><small>ม.ต้น</small></label>
+            
+            <input type="radio" name="tier" id="tier-adv" value="advanced">
+            <label for="tier-adv">Advanced<br><small>ม.ปลาย</small></label>
+        </div>
+
+        <!-- Hours Selection -->
+        <div class="section-label">ชั่วโมงเรียน (HOURS)</div>
+        <div class="radio-group">
+            <input type="radio" name="hours" id="hr-1" value="1">
+            <label for="hr-1">1 ชม.<br><small>(ทดลอง)</small></label>
+
+            <input type="radio" name="hours" id="hr-10" value="10" checked>
+            <label for="hr-10">10 ชม.</label>
+            
+            <input type="radio" name="hours" id="hr-20" value="20">
+            <label for="hr-20">20 ชม.</label>
+        </div>
+
+        <!-- Pax Selection -->
+        <div class="section-label">จำนวนผู้เรียน (PAX)</div>
+        <div class="radio-group pax-group">
+            <input type="radio" name="pax" id="pax-1" value="1" checked>
+            <label for="pax-1">1 คน</label>
+            <input type="radio" name="pax" id="pax-2" value="2">
+            <label for="pax-2">2 คน</label>
+            <input type="radio" name="pax" id="pax-3" value="3">
+            <label for="pax-3">3 คน</label>
+            <input type="radio" name="pax" id="pax-4" value="4">
+            <label for="pax-4">4 คน</label>
+        </div>
+
+        <!-- Output Summary Card -->
+        <div class="summary-card">
+            <div class="summary-header">
+                <div>
+                    <div class="title" id="out-tier-text">WIT ONE FOUNDATION</div>
+                    <div class="subtitle"><span id="out-hr">10</span> ชม. · <span id="out-pax">1</span> คน</div>
+                </div>
+                <div class="price-box">
+                    <div class="unit">ราคารวมทั้งหมด</div>
+                    <div class="price" id="out-total-price">1,600</div>
+                </div>
+            </div>
+
+            <div class="summary-body">
+                <!-- ข้อมูลพื้นฐาน -->
+                <div class="data-row">
+                    <div class="label">ราคา/คน</div>
+                    <div class="value" id="out-price-per">1,600 บาท</div>
+                </div>
+
+                <!-- ข้อมูลคอร์ส 10, 20 ชม. (ซ่อนเมื่อเลือก 1 ชม.) -->
+                <div class="data-row row-multi">
+                    <div class="label">ยอดโอนล่วงหน้า/คน<small>โอนเข้าบัญชี WIT ONE</small></div>
+                    <div class="value badge" id="out-adv-per">600 บาท</div>
+                </div>
+                <div class="data-row row-multi">
+                    <div class="label">ยอดโอนล่วงหน้ารวม<small>รวมจากทุกคน</small></div>
+                    <div class="value" id="out-adv-total">600 บาท</div>
+                </div>
+
+                <!-- กำไรแพลตฟอร์ม -->
+                <div class="data-row">
+                    <div class="label">ยอดหักเข้า WIT ONE<small>กำไรแพลตฟอร์ม</small></div>
+                    <div class="value badge dark" id="out-admin-cut">400 บาท</div>
+                </div>
+
+                <!-- ข้อมูลคอร์ส 1 ชม. (แสดงเมื่อเลือก 1 ชม.) -->
+                <div class="data-row row-1hr" style="display:none; background: #eef8f2; margin: 0 -20px; padding: 12px 20px;">
+                    <div class="label" style="color: var(--accent-green); font-weight:600;">ค่าสอนติวเตอร์รวม<small>แอดมินโอนให้หลังสอนเสร็จ</small></div>
+                    <div class="value" style="color: var(--accent-green);" id="out-1hr-tutor">120 บาท</div>
+                </div>
+
+                <!-- ข้อมูลคอร์ส 10, 20 ชม. -->
+                <div class="data-row row-multi" style="background: #fdfaf5; margin: 0 -20px; padding: 12px 20px;">
+                    <div class="label" style="color: var(--accent-gold); font-weight:600;">เงินประกันปิดคอร์ส<small>แอดมินโอนให้ติวเตอร์วันจบ</small></div>
+                    <div class="value" style="color: var(--accent-gold);" id="out-guarantee">200 บาท</div>
+                </div>
+                <div class="data-row row-multi">
+                    <div class="label">รายงวดติวเตอร์/คน<small>แบ่งจ่ายตามรอบชั่วโมง</small></div>
+                    <div class="value" id="out-inst-per">500 บาท</div>
+                </div>
+                <div class="data-row row-multi">
+                    <div class="label">ยอดรายงวดรวม<small>เด็กโอนตรงให้ติวเตอร์</small></div>
+                    <div class="value badge" id="out-inst-total">500 บาท</div>
+                </div>
+                <div class="data-row row-multi">
+                    <div class="label">ค่าสอนติวเตอร์รวม<small>รายงวดทั้งหมด + เงินประกัน</small></div>
+                    <div class="value" style="color:var(--accent-green);" id="out-tutor-total">1,200 บาท</div>
+                </div>
+            </div>
+
+            <div class="admin-note">
+                <span style="background: #ddd; padding: 2px 6px; border-radius:4px; font-weight:bold; color:#333;">Admin เท่านั้น</span><br>
+                <span id="note-text-prefix">เด็กโอนมัดจำรวม </span><b id="note-adv">600</b> บาท • WIT ONE หัก <b id="note-cut">400</b> บาท • <span id="note-text-suffix">เก็บเป็นเงินประกันรอโอนปิดคอร์ส </span><b id="note-gar">200</b> บาท
+            </div>
+        </div>
+
+        <!-- Copy Text Tutor -->
+        <div class="copy-section">
+            <div class="copy-title">ก็อปส่งให้ติวเตอร์</div>
+            <div class="preview-text" id="tutor-text"></div>
+            <button class="btn-copy tutor" onclick="copyText('tutor-text')">
+                📋 คัดลอกข้อความให้ติวเตอร์
+            </button>
+        </div>
+
+        <!-- Copy Text Student -->
+        <div class="copy-section">
+            <div class="copy-title">ก็อปส่งให้น้อง (สรุปยอด)</div>
+            <div class="preview-text" style="background: #f4faeb;" id="student-text"></div>
+            <button class="btn-copy student" onclick="copyText('student-text')">
+                📋 คัดลอกข้อความให้น้อง
+            </button>
+        </div>
+
+        <!-- Upsell Copy (แสดงเฉพาะเมื่อเลือก 1 ชม.) -->
+        <div class="copy-section row-1hr" style="display:none;">
+            <div class="copy-title" style="color: var(--accent-gold);">แจ้งเงื่อนไขต่อคอร์ส 10 ชม.</div>
+            <div class="preview-text" style="background: #fffbf0; border-color: #f3e5b5;" id="upgrade-10-text"></div>
+            <button class="btn-copy" style="background-color: var(--accent-gold); color: white;" onclick="copyText('upgrade-10-text')">
+                📋 คัดลอกข้อความ 10 ชม.
+            </button>
+        </div>
+
+        <div class="copy-section row-1hr" style="display:none;">
+            <div class="copy-title" style="color: var(--accent-gold);">แจ้งเงื่อนไขต่อคอร์ส 20 ชม.</div>
+            <div class="preview-text" style="background: #fffbf0; border-color: #f3e5b5;" id="upgrade-20-text"></div>
+            <button class="btn-copy" style="background-color: var(--accent-gold); color: white;" onclick="copyText('upgrade-20-text')">
+                📋 คัดลอกข้อความ 20 ชม.
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        // Database ครอบคลุมคลาสทดลอง 1 ชม. และแพ็กเกจ 10, 20 ชม.
+        const db = {
+            foundation: {
+                1: {
+                    1: { total: 200, tutor: 120, adminCut: 80 },
+                    2: { total: 300, tutor: 150, adminCut: 150 },
+                    3: { total: 360, tutor: 180, adminCut: 180 },
+                    4: { total: 400, tutor: 210, adminCut: 190 }
+                },
+                10: {
+                    1: { totalPer: 1600, advPer: 600, instPer: 500, guarantee: 200, adminCut: 400 },
+                    2: { totalPer: 1300, advPer: 600, instPer: 350, guarantee: 200, adminCut: 1000 },
+                    3: { totalPer: 1000, advPer: 600, instPer: 200, guarantee: 700, adminCut: 1100 },
+                    4: { totalPer: 800, advPer: 600, instPer: 100, guarantee: 1300, adminCut: 1100 }
+                },
+                20: {
+                    1: { totalPer: 2800, advPer: 800, instPer: 500, guarantee: 300, adminCut: 500 },
+                    2: { totalPer: 2200, advPer: 800, instPer: 350, guarantee: 500, adminCut: 1100 },
+                    3: { totalPer: 1700, advPer: 800, instPer: 225, guarantee: 1200, adminCut: 1200 },
+                    4: { totalPer: 1500, advPer: 800, instPer: 175, guarantee: 1500, adminCut: 1700 }
+                }
+            },
+            intermediate: {
+                1: {
+                    1: { total: 250, tutor: 160, adminCut: 90 },
+                    2: { total: 400, tutor: 210, adminCut: 190 },
+                    3: { total: 540, tutor: 250, adminCut: 290 },
+                    4: { total: 600, tutor: 290, adminCut: 310 }
+                },
+                10: {
+                    1: { totalPer: 2000, advPer: 800, instPer: 600, guarantee: 400, adminCut: 400 },
+                    2: { totalPer: 1700, advPer: 800, instPer: 450, guarantee: 300, adminCut: 1300 },
+                    3: { totalPer: 1400, advPer: 800, instPer: 300, guarantee: 700, adminCut: 1700 },
+                    4: { totalPer: 1200, advPer: 800, instPer: 200, guarantee: 1200, adminCut: 2000 }
+                },
+                20: {
+                    1: { totalPer: 3600, advPer: 1000, instPer: 650, guarantee: 500, adminCut: 500 },
+                    2: { totalPer: 3000, advPer: 1000, instPer: 500, guarantee: 200, adminCut: 1800 },
+                    3: { totalPer: 2500, advPer: 1000, instPer: 375, guarantee: 700, adminCut: 2300 },
+                    4: { totalPer: 2100, advPer: 1000, instPer: 275, guarantee: 1600, adminCut: 2400 }
+                }
+            },
+            advanced: {
+                1: {
+                    1: { total: 300, tutor: 200, adminCut: 100 },
+                    2: { total: 500, tutor: 260, adminCut: 240 },
+                    3: { total: 660, tutor: 310, adminCut: 350 },
+                    4: { total: 800, tutor: 360, adminCut: 440 }
+                },
+                10: {
+                    1: { totalPer: 2400, advPer: 1000, instPer: 700, guarantee: 600, adminCut: 400 },
+                    2: { totalPer: 2100, advPer: 1000, instPer: 550, guarantee: 400, adminCut: 1600 },
+                    3: { totalPer: 1800, advPer: 1000, instPer: 400, guarantee: 700, adminCut: 2300 },
+                    4: { totalPer: 1600, advPer: 1000, instPer: 300, guarantee: 1200, adminCut: 2800 }
+                },
+                20: {
+                    1: { totalPer: 4400, advPer: 1400, instPer: 750, guarantee: 900, adminCut: 500 },
+                    2: { totalPer: 3800, advPer: 1400, instPer: 600, guarantee: 400, adminCut: 2400 },
+                    3: { totalPer: 3300, advPer: 1400, instPer: 475, guarantee: 700, adminCut: 3500 },
+                    4: { totalPer: 2900, advPer: 1400, instPer: 375, guarantee: 1600, adminCut: 4000 }
+                }
+            }
+        };
+
+        function fmt(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        function getUpgradeText(tier, hoursTarget, pax, trialPerPax) {
+            const data = db[tier][hoursTarget][pax];
+            const total = data.totalPer * pax;
+            const remainPerPax = data.totalPer - trialPerPax;
+            const upgradeAdvPerPax = data.advPer - trialPerPax;
+            const upgradeAdvTotal = upgradeAdvPerPax * pax;
+            
+            const hoursList = hoursTarget === 10 ? [3, 8] : [3, 8, 13, 18];
+            const tutorDirectPerPax = data.instPer * hoursList.length;
+
+            let text = `💡 สนใจต่อคอร์ส ${hoursTarget} ชม. ราคารวม ${fmt(total)} บาท`;
+            if (pax > 1) text += ` (คนละ ${fmt(data.totalPer)} บาท)`;
+            
+            text += `\n(หักค่าทดลองเรียน${pax > 1 ? 'คนละ ' : ' '}${fmt(trialPerPax)} บาท แล้ว เหลือยอดชำระ${pax > 1 ? 'คนละ ' : ' '}${fmt(remainPerPax)} บาท)`;
+            text += `\n\nแบ่งจ่ายเป็น 2 ส่วนครับ\n`;
+            text += `1️⃣ โอนให้ WIT ONE ตอนนี้เลย → ${pax > 1 ? 'คนละ ' : ''}${fmt(upgradeAdvPerPax)} บาท`;
+            if (pax > 1) text += ` (รวม ${fmt(upgradeAdvTotal)} บาท เพื่อยืนยันคอร์ส)\n`;
+            else text += ` (เพื่อยืนยันคอร์ส)\n`;
+            text += `🏦 กสิกร 1811482591 · กรวิชญ์ ชื่นวัฒนา\nโปรดแจ้งสลิปด้วยนะครับ 🙏\n\n`;
+            text += `2️⃣ จ่ายกับพี่ติวเตอร์โดยตรง → ${pax > 1 ? 'คนละ ' : ''}${fmt(tutorDirectPerPax)} บาท (แบ่งจ่าย ${hoursList.length} งวด) 💡`;
+            return text;
+        }
+
+        function calculate() {
+            const tier = document.querySelector('input[name="tier"]:checked').value;
+            const hours = parseInt(document.querySelector('input[name="hours"]:checked').value);
+            const pax = parseInt(document.querySelector('input[name="pax"]:checked').value);
+            
+            const data = db[tier][hours][pax];
+
+            // Toggle rows
+            document.querySelectorAll('.row-multi').forEach(el => {
+                el.style.display = hours === 1 ? 'none' : (el.classList.contains('data-row') ? 'flex' : 'block');
+            });
+            document.querySelectorAll('.row-1hr').forEach(el => {
+                el.style.display = hours === 1 ? (el.classList.contains('data-row') ? 'flex' : 'block') : 'none';
+            });
+
+            document.getElementById('out-tier-text').innerText = "WIT ONE " + tier.toUpperCase();
+            document.getElementById('out-hr').innerText = hours;
+            document.getElementById('out-pax').innerText = pax;
+
+            if (hours === 1) {
+                const trialPerPax = data.total / pax;
+                const paxText = pax > 1 ? ` (กลุ่ม ${pax} คน)` : "";
+                
+                document.getElementById('out-total-price').innerText = fmt(data.total);
+                document.getElementById('out-price-per').innerText = fmt(trialPerPax) + " บาท";
+                document.getElementById('out-admin-cut').innerText = fmt(data.adminCut) + " บาท";
+                document.getElementById('out-1hr-tutor').innerText = fmt(data.tutor) + " บาท";
+
+                document.getElementById('note-text-prefix').innerText = "ยอดโอนรวม ";
+                document.getElementById('note-adv').innerText = fmt(data.total);
+                document.getElementById('note-cut').innerText = fmt(data.adminCut);
+                document.getElementById('note-text-suffix').innerText = "โอนให้ติวเตอร์หลังสอน ";
+                document.getElementById('note-gar').innerText = fmt(data.tutor);
+
+                document.getElementById('tutor-text').innerText = `หลังเรียนเสร็จแล้ว ถ้าน้องสนใจต่อคอร์สแอดมินจะแจ้งให้ทราบอีกครั้งนะครับ\n💰 หากน้องไม่ต่อคอร์ส คลาสทดลองเรียน 1 ชม.${paxText} ค่าตอบแทนงานนี้รวม ${fmt(data.tutor)} บาท ทางแอดมินจะโอนให้นะครับ`;
+                document.getElementById('student-text').innerText = `✅ สรุปยอดคลาสทดลองเรียน 1 ชม.${paxText}\nราคา${pax > 1 ? 'คนละ ' : ''}${fmt(trialPerPax)} บาท (ยอดโอนรวม ${fmt(data.total)} บาท)\n\nสามารถโอนชำระเพื่อล็อกคิวติวเตอร์ได้ที่:\n🏦 กสิกร 1811482591 · กรวิชญ์ ชื่นวัฒนา\n\nส่งสลิปแล้วแจ้งแอดมินได้เลยนะครับ 🥰`;
+                
+                document.getElementById('upgrade-10-text').innerText = getUpgradeText(tier, 10, pax, trialPerPax);
+                document.getElementById('upgrade-20-text').innerText = getUpgradeText(tier, 20, pax, trialPerPax);
+
+            } else {
+                const totalPrice = data.totalPer * pax;
+                const advTotal = data.advPer * pax;
+                const instTotal = data.instPer * pax;
+                const hoursList = hours === 10 ? [3, 8] : [3, 8, 13, 18];
+                const numInstallments = hoursList.length;
+                const totalTutorFee = (instTotal * numInstallments) + data.guarantee;
+                const totalInstAll = instTotal * numInstallments;
+                const totalInstPerPersonAll = data.instPer * numInstallments;
+
+                document.getElementById('out-total-price').innerText = fmt(totalPrice);
+                document.getElementById('out-price-per').innerText = fmt(data.totalPer) + " บาท";
+                document.getElementById('out-adv-per').innerText = fmt(data.advPer) + " บาท";
+                document.getElementById('out-adv-total').innerText = fmt(advTotal) + " บาท";
+                document.getElementById('out-admin-cut').innerText = fmt(data.adminCut) + " บาท";
+                document.getElementById('out-guarantee').innerText = fmt(data.guarantee) + " บาท";
+                document.getElementById('out-inst-per').innerText = fmt(data.instPer) + " บาท";
+                document.getElementById('out-inst-total').innerText = fmt(instTotal) + " บาท";
+                document.getElementById('out-tutor-total').innerText = fmt(totalTutorFee) + " บาท";
+
+                document.getElementById('note-text-prefix').innerText = "เด็กโอนมัดจำรวม ";
+                document.getElementById('note-adv').innerText = fmt(advTotal);
+                document.getElementById('note-cut').innerText = fmt(data.adminCut);
+                document.getElementById('note-text-suffix').innerText = "เก็บเป็นเงินประกันรอโอนปิดคอร์ส ";
+                document.getElementById('note-gar').innerText = fmt(data.guarantee);
+
+                // --- Generate Tutor Text ---
+                let instBreakdownTutor = "";
+                let tutorMsg = "";
+                if (pax === 1) {
+                    hoursList.forEach(hr => {
+                        instBreakdownTutor += `- ชั่วโมงที่ ${hr} → ${fmt(instTotal)} บาท\n`;
+                    });
+                    tutorMsg = `💰 ค่าสอนงานนี้ ${hours} ชม. รวม ${fmt(totalTutorFee)} บาท
+น้องจ่ายพี่โดยตรง ${fmt(totalInstAll)} บาท แบ่งเป็น
+${instBreakdownTutor}
+ส่วนอีก ${fmt(data.guarantee)} บาท แอดมินจะโอนให้หลังจากติวเตอร์ส่ง 2 อย่างนี้ครบ ในการสอนครั้งสุดท้ายเสร็จ (ปิดคอร์ส) นะครับ
+✅ 1. รูปการเรียนการสอน (เห็นบรรยากาศการเรียนชัดเจน แอดมินจะนำไปโปรโมท)
+✅ 2. แคปแชท feedback จากน้อง (เช่น ถามน้องว่า "เรียนกับพี่เป็นยังไงบ้าง เข้าใจขึ้นไหม" ครับ 😊)
+📌 หลังส่งแล้ว รบกวนแจ้ง 'รหัสงาน' และ 'พร้อมเพย์หรือเลขบัญชี' พร้อมชื่อเจ้าของบัญชี ทุกครั้ง ด้วยนะครับ`;
+                } else {
+                    hoursList.forEach(hr => {
+                        instBreakdownTutor += `- ชั่วโมงที่ ${hr} → ${fmt(instTotal)} บาท (คนละ ${fmt(data.instPer)} บาท)\n`;
+                    });
+                    tutorMsg = `💰 ค่าสอนงานนี้ ${hours} ชม. รวม ${fmt(totalTutorFee)} บาท
+น้องจ่ายพี่โดยตรง ${fmt(totalInstAll)} บาท (คนละ ${fmt(totalInstPerPersonAll)} บาท) แบ่งเป็น
+${instBreakdownTutor}
+ส่วนอีก ${fmt(data.guarantee)} บาท แอดมินจะโอนให้หลังจากติวเตอร์ส่ง 2 อย่างนี้ครบ ในการสอนครั้งสุดท้ายเสร็จ (ปิดคอร์ส) นะครับ
+✅ 1. รูปการเรียนการสอน (เห็นบรรยากาศการเรียนชัดเจน แอดมินจะนำไปโปรโมท)
+✅ 2. แคปแชท feedback จากน้อง (เช่น ถามน้องว่า "เรียนกับพี่เป็นยังไงบ้าง เข้าใจขึ้นไหม" ครับ 😊)
+📌 หลังส่งแล้ว รบกวนแจ้ง 'รหัสงาน' และ 'พร้อมเพย์หรือเลขบัญชี' พร้อมชื่อเจ้าของบัญชี ทุกครั้ง ด้วยนะครับ`;
+                }
+                document.getElementById('tutor-text').innerText = tutorMsg;
+
+                // --- Generate Student Text ---
+                let studentMsg = "";
+                let instBreakdownStudentArr = [];
+                if (pax === 1) {
+                    hoursList.forEach(hr => {
+                        instBreakdownStudentArr.push(`ชั่วโมงที่ ${hr} จำนวน ${fmt(instTotal)} บาท`);
+                    });
+                    const instBreakdownStudent = `[ ${instBreakdownStudentArr.join(" / ")} ]`;
+                    studentMsg = `💵 ได้รับยอดแล้วครับ 💵
+เดี๋ยวทางเราจะทำการติดต่อพี่ติวเตอร์ ภายในวันที่ .... แล้วจะแจ้งทางนี้นะครับ 🥰
+📌 ในส่วนค่าเรียนที่เหลือ ${fmt(totalInstAll)} บาท สามารถแบ่งชำระทุก ๆ 5 ชั่วโมง ดังนี้ ${instBreakdownStudent} ได้กับพี่ติวเตอร์ครับ 🙏🏽`;
+                } else {
+                    hoursList.forEach(hr => {
+                        instBreakdownStudentArr.push(`ชั่วโมงที่ ${hr} จำนวน ${fmt(instTotal)} บาท (คนละ ${fmt(data.instPer)})`);
+                    });
+                    const instBreakdownStudent = `[ ${instBreakdownStudentArr.join(" / ")} ]`;
+                    studentMsg = `💵 ได้รับยอดแล้วครับ 💵
+เดี๋ยวทางเราจะทำการติดต่อพี่ติวเตอร์ ภายในวันที่ .... แล้วจะแจ้งทางนี้นะครับ 🥰
+📌 ในส่วนค่าเรียนที่เหลือ ${fmt(totalInstAll)} บาท [คนละ ${fmt(totalInstPerPersonAll)} บาท] สามารถแบ่งชำระทุก ๆ 5 ชั่วโมง ดังนี้ ${instBreakdownStudent} ได้กับพี่ติวเตอร์ครับ 🙏🏽`;
+                }
+                document.getElementById('student-text').innerText = studentMsg;
+            }
+        }
+
+        // ฟังก์ชันคัดลอกข้อความ
+        function copyText(elementId) {
+            const text = document.getElementById(elementId).innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert("คัดลอกข้อความเรียบร้อยแล้ว!");
+            });
+        }
+
+        // จับ Event การเปลี่ยนค่า
+        document.querySelectorAll('input[type=radio]').forEach(input => {
+            input.addEventListener('change', calculate);
+        });
+
+        calculate();
+    </script>
+</body>
+</html>
